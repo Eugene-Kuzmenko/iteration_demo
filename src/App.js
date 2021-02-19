@@ -1,5 +1,5 @@
 import { Tab } from "semantic-ui-react";
-import Iterator from "./components/Iterator";
+import Counter from "./components/Counter";
 import "./styles.css";
 
 const PANES = [
@@ -7,7 +7,7 @@ const PANES = [
     menuItem: "First",
     render: () => (
       <Tab.Pane>
-        <Iterator>placeholder 1</Iterator>
+        <Counter />
       </Tab.Pane>
     )
   },

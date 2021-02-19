@@ -4,8 +4,7 @@ import styles from "./Iterator.module.scss";
 
 class Iterator extends PureComponent {
   static defaultProps = {
-    interval: 1000,
-    iterate: () => {}
+    interval: 1000
   };
 
   state = {
@@ -26,12 +25,24 @@ class Iterator extends PureComponent {
   resolve = null;
   reject = null;
 
+  startIteration = () => {
+    const { iterate } = this.props;
+    if (!this.resolve && iterate)
+      iterate(this.wait).then(() => {
+        if (this.state.isPlaying) this.setState({ isPlaying: false });
+        clearInterval(this.interval);
+        this.resolve = null;
+        this.reject = null;
+      });
+  };
   play = () => {
-    const { interval, iterate } = this.props;
-    setInterval(this.step, interval);
-    iterate(this.wait);
+    const { interval } = this.props;
+    this.startIteration();
+    this.setState({ isPlaying: true });
+    this.interval = setInterval(this.step, interval);
   };
   step = () => {
+    this.startIteration();
     if (this.resolve) this.resolve();
   };
   wait = () => {
@@ -41,10 +52,15 @@ class Iterator extends PureComponent {
     });
   };
   pause = () => {
-    clearInterval(this.step);
+    clearInterval(this.interval);
+    this.setState({ isPlaying: false });
   };
   stop = () => {
-    if (this.reject) reject("stopped");
+    if (this.reject) this.reject("stopped");
+    if (this.state.isPlaying) this.setState({ isPlaying: false });
+    clearInterval(this.interval);
+    this.resolve = null;
+    this.reject = null;
   };
 
   render() {
